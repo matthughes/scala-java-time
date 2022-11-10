@@ -97,19 +97,9 @@ lazy val commonSettings = Seq(
         Seq.empty
     }
   },
-  scalacOptions ++= { if (isDotty.value) Seq.empty else Seq("-target:jvm-1.8") },
-  scalacOptions --= {
-    if (isDotty.value)
-      List(
-        "-Xfatal-warnings"
-      )
-    else
-      List(
-      )
-  },
+  scalacOptions ++= Seq("-target:jvm-1.8"),
   javaOptions ++= Seq("-Dfile.encoding=UTF8"),
   autoAPIMappings                 := true,
-  Compile / doc / sources         := { if (isDotty.value) Seq() else (Compile / doc / sources).value }
 )
 
 /**
@@ -169,25 +159,25 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       .cross(CrossVersion.for3Use2_13)
   )
   .jsSettings(
-    scalacOptions ++= {
-      if (isDotty.value) Seq("-scalajs-genStaticForwardersForNonTopLevelObjects")
-      else Seq("-P:scalajs:genStaticForwardersForNonTopLevelObjects")
-    },
-    scalacOptions ++= {
-
-      if (isDotty.value) Seq.empty
-      else {
-        val tagOrHash =
-          if (isSnapshot.value) sys.process.Process("git rev-parse HEAD").lineStream_!.head
-          else s"v${version.value}"
-        (Compile / sourceDirectories).value.map { f =>
-          val a = f.toURI.toString
-          val g =
-            "https://raw.githubusercontent.com/cquiroz/scala-java-time/" + tagOrHash + "/shared/src/main/scala/"
-          s"-P:scalajs:mapSourceURI:$a->$g/"
-        }
-      }
-    },
+    // scalacOptions ++= {
+    //   if (isDotty.value) Seq("-scalajs-genStaticForwardersForNonTopLevelObjects")
+    //   else Seq("-P:scalajs:genStaticForwardersForNonTopLevelObjects")
+    // },
+    // scalacOptions ++= {
+    //
+    //   if (isDotty.value) Seq.empty
+    //   else {
+    //     val tagOrHash =
+    //       if (isSnapshot.value) sys.process.Process("git rev-parse HEAD").lineStream_!.head
+    //       else s"v${version.value}"
+    //     (Compile / sourceDirectories).value.map { f =>
+    //       val a = f.toURI.toString
+    //       val g =
+    //         "https://raw.githubusercontent.com/cquiroz/scala-java-time/" + tagOrHash + "/shared/src/main/scala/"
+    //       s"-P:scalajs:mapSourceURI:$a->$g/"
+    //     }
+    //   }
+    // },
     Compile / sourceGenerators += Def.task {
       val srcDirs        = (Compile / sourceDirectories).value
       val destinationDir = (Compile / sourceManaged).value
@@ -247,7 +237,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     publish / skip     := true,
     Keys.`package`     := file(""),
     libraryDependencies +=
-      "org.scalatest" %%% "scalatest" % "3.2.13" % Test,
+      "org.scalatest" %%% "scalatest" % "3.2.14" % Test,
     scalacOptions ~= (_.filterNot(
       Set("-Wnumeric-widen", "-Ywarn-numeric-widen", "-Ywarn-value-discard", "-Wvalue-discard")
     ))
